@@ -51,11 +51,11 @@ class MutInt { public:
 
 };
 
-class VERBOSE : public MutInt { public:
+class MutState : public MutInt { public:
 
     int lvalue;
 
-    VERBOSE(int val) : MutInt(val) {
+    MutState(int val) : MutInt(val) {
         this->lvalue = val;
     }
 

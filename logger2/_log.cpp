@@ -3,7 +3,7 @@
 #include "remap.h"
 
 #include "Formatter.hpp"
-#include "VERBOSE.hpp"
+#include "MutState.hpp"
 
 PYBIND11_MODULE(_log, m) {
 
@@ -24,12 +24,12 @@ PYBIND11_MODULE(_log, m) {
         .def("__add__", &MutInt::__add__, py::is_operator())
         .def("__sub__", &MutInt::__sub__, py::is_operator());
 
-    py::class_<VERBOSE, MutInt>(m, "VERBOSE")
+    py::class_<MutState, MutInt>(m, "MutState")
         .def(py::init<int>(), py::arg("parsed_lvalue"))
-        .def_readwrite("lvalue", &VERBOSE::lvalue)
-        .def("pause", &VERBOSE::pause)
-        .def("resume", &VERBOSE::resume)
-        .def("enable", &VERBOSE::enable)
-        .def("disable", &VERBOSE::disable);
+        .def_readwrite("lvalue", &MutState::lvalue)
+        .def("pause", &MutState::pause)
+        .def("resume", &MutState::resume)
+        .def("enable", &MutState::enable)
+        .def("disable", &MutState::disable);
 
 }
