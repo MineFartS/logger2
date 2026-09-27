@@ -1,19 +1,14 @@
-from logging import basicConfig as _basicConfig
-from sys import argv as _argv
+from logging import basicConfig
+from functools import partial
 import logging as nlog
+from sys import argv
 from . import _log
 
-#================================================================
-
 def _arg(*name:str):
-    return len(set(name) & set(_argv))
+    return _log.MutState(len(set(name) & set(argv)))
 
-# @dead-code-ignore
-HELP: bool = _arg('-h', '--help')
-
-VERBOSE = _log.VERBOSE( _arg('-v', '--verbose') )
-
-#================================================================
+HELP = _arg('-h', '--help')
+VERBOSE = _arg('-v', '--verbose')
 
 class _Formatter(_log.Formatter, nlog.Formatter):
     def __init__(self) -> None:
@@ -27,9 +22,8 @@ class _StreamHandler(nlog.StreamHandler):
         self.setFormatter(_Formatter())
         self.setLevel(10)
 
-_basicConfig(
+setup = partial(basicConfig,
     level = 10,
     handlers = [_StreamHandler()]
 )
 
-#================================================================
