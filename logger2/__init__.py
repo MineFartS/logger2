@@ -1,14 +1,15 @@
 from logging import basicConfig
+from ._log import VERBOSE, HELP
 from functools import partial
 import logging as nlog
 from sys import argv
 from . import _log
 
-def _arg(*name:str):
-    return _log.MutState(len(set(name) & set(argv)))
+def _arg(*name:str) -> int:
+    return min(1, len(set(name) & set(argv)))
 
-HELP = _arg('-h', '--help')
-VERBOSE = _arg('-v', '--verbose')
+VERBOSE.set(_arg('-v', '--verbose'))
+HELP.set(_arg('-h', '--help'))
 
 class _Formatter(_log.Formatter, nlog.Formatter):
     def __init__(self) -> None:

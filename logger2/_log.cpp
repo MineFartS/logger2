@@ -25,11 +25,14 @@ PYBIND11_MODULE(_log, m) {
         .def("__sub__", &MutInt::__sub__, py::is_operator());
 
     py::class_<MutState, MutInt>(m, "MutState")
-        .def(py::init<int>(), py::arg("parsed_lvalue"))
         .def_readwrite("lvalue", &MutState::lvalue)
+        .def("set", &MutState::set)
         .def("pause", &MutState::pause)
         .def("resume", &MutState::resume)
         .def("enable", &MutState::enable)
         .def("disable", &MutState::disable);
+    
+    m.attr("VERBOSE") = py::cast(&VERBOSE);
+    m.attr("HELP") = py::cast(&HELP);
 
 }

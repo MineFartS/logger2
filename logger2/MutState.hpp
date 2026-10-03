@@ -1,3 +1,5 @@
+#pragma once
+
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
 #include <string>
@@ -77,5 +79,14 @@ class MutState : public MutInt { public:
         this->value = 0;
         this->lvalue = 0;
     }
+
+    void set(int val) {
+        this->value = val;
+        this->lvalue = val;
+    }
+
 };
+
+extern MutState VERBOSE = MutState(0);
+extern MutState HELP = MutState(0);
 

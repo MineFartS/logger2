@@ -1,4 +1,5 @@
 #pragma once
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <string>
@@ -10,7 +11,9 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+
 #include "remap.h"
+#include "MutState.hpp"
 
 class Formatter {
 private:
@@ -187,10 +190,7 @@ public:
             log_file.close();
         }
 
-        py::object _pkg = _sys.attr("modules")["philh_myftp_biz"];
-        bool is_verbose = _builtins.attr("bool")(_pkg.attr("VERBOSE")).cast<bool>();
-
-        if (is_verbose || (levelno > 10)) {
+        if ((VERBOSE.value == 1) || (levelno > 10)) {
             return "\n" + COLOR + "\033[1m" + TIME + " " + FILE_TXT + " " + LEVEL + "\033[22m\n" + MESS + "\033[0m\n" + TRACE;
         }
 
