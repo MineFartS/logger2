@@ -31,6 +31,7 @@ private:
     pyobj _traceback_mod = pymod::import("traceback");
     pyobj _json = pymod::import("json");
     pyobj _builtins = pymod::import("builtins");
+    pyobj _site = pymod::import("site");
 
     str to_lower(str s) const {
         std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::tolower(c); });
@@ -74,36 +75,39 @@ private:
     }
 
     str _file() const {
-        pyobj frame = _sys.attr("_getframe")(0);
 
-        while (!frame.is_none()) {
-            pyobj code = frame.attr("f_code");
+        vector<fs::path> appdirs;
+
+        str _exe = _sys.attr("executable").cast<str>();
+        appdirs.push_back( fs::path(_exe).parent_path() );
+
+        str _usr = _site.attr("getuserbase")().cast<str>();
+        appdirs.push_back( fs::path(_usr) );
+
+        vector<str> frames;
+        frames.push_back("unknown:0");
+
+        for (py::handle frame : _traceback_mod.attr("extract_stack")()) {
             
-            str path = code.attr("co_filename").cast<str>();
-            std::replace(path.begin(), path.end(), '\\', '/');
-            path = to_lower(path);
+            str _file = frame.attr("filename").cast<str>();
+            fs::path _path = fs::path(_file);
+            
+            str _name = _path.filename().string();
+            int _line = frame.attr("lineno").cast<int>();
+            str label = (_name + ":" + std::to_string(_line));
 
-            if (contains(path, "lib/logging")
-                || contains(path, "site-packages/fastapi")
-                || contains(path, "site-packages/starlette")
-                || contains(path, "site-packages/uvicorn")
-                || contains(path, "threading.py")
-                || contains(path, "contextlib.py")
-                || contains(path, "site-packages/philh_myftp_biz")
-            ) {
-                frame = frame.attr("f_back");
-                continue;
+            bool in_app_dir = false;
+            for (fs::path base : appdirs) {
+                fs::path rel = _path.lexically_relative(base);
+                in_app_dir |= (!rel.empty() && *rel.begin() != "..");
             }
-
-            str name = fs::path(path).filename().string();
-            int line = frame.attr("f_lineno").cast<int>();
-            return name + ":" + std::to_string(line);
             
-            // Fixed safety step: Ensure frame always progresses to avoid dead loops
-            frame = frame.attr("f_back"); 
+            if (!in_app_dir) 
+                frames.push_back(label);
+            
         }
 
-        return "unknown:0";
+        return frames.back();
     }
 
     str _message(const pyobj& record) const {
