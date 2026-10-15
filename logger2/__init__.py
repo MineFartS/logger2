@@ -1,9 +1,11 @@
 from logging import basicConfig
 from ._log import VERBOSE, HELP
 from functools import partial
+from sys import argv, modules
 import logging as nlog
-from sys import argv
 from . import _log
+
+PYPI_GEN: bool = ('mypy' in modules)
 
 def _arg(*name:str) -> int:
     return min(1, len(set(name) & set(argv)))
