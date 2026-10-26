@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "stru.h"
 #include "remap.h"
 #include "MutState.hpp"
 
@@ -63,7 +64,7 @@ private:
             if (!fs::exists(pycache))
                 fs::create_directories(pycache);
 
-            _cached_wfile = (pycache / ("philh_myftp_biz.log"));
+            _cached_wfile = (pycache / (stru::split(_file(), ":", 0) + ".log"));
             std::ofstream clear_stream(_cached_wfile, std::ios::out | std::ios::trunc);
 
         }
