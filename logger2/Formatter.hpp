@@ -56,13 +56,9 @@ private:
         if (_cached_wfile.empty()) {
             pyobj mod = _sys.attr("modules")["__main__"];
 
-            fs::path pycache;
-            if (py::hasattr(mod, "__file__")) {
-                pycache = fs::absolute(mod.attr("__file__").cast<str>()).parent_path();
-            } else {
-                pycache = fs::current_path();
-            }
-            pycache /= "__pycache__";
+            fs::path pycache = (py::hasattr(mod, "__file__")
+                ? fs::absolute(mod.attr("__file__").cast<str>()).parent_path()
+                : fs::current_path()) / "__pycache__";
 
             if (!fs::exists(pycache))
                 fs::create_directories(pycache);
